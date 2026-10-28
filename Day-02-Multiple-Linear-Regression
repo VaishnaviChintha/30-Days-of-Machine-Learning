@@ -1,0 +1,79 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+# 1. Create a sample dataset
+np.random.seed(42)
+
+X = np.random.randint(500, 2500, size=(100, 3))
+
+# Features: area, bedrooms, house age
+area = X[:, 0]
+bedrooms = X[:, 1]
+age = X[:, 2]
+
+# Target: house price (synthetic data)
+y = (
+    1500 * area
+    + 10000 * bedrooms
+    - 800 * age
+    + 50000
+    + np.random.normal(0, 20000, size=100)
+)
+
+# 2. Split the dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 3. Create the model
+model = LinearRegression()
+
+# 4. Train the model
+model.fit(X_train, y_train)
+
+# 5. Make predictions
+y_pred = model.predict(X_test)
+
+# 6. Evaluate the model
+print("Multiple Linear Regression Results")
+print("----------------------------------")
+print("Intercept:", round(model.intercept_, 2))
+print("Coefficients:", model.coef_)
+print("MAE:", round(mean_absolute_error(y_test, y_pred), 2))
+print("MSE:", round(mean_squared_error(y_test, y_pred), 2))
+print("R2 Score:", round(r2_score(y_test, y_pred), 4))
+
+# 7. Predict a new house price
+new_house = np.array([[1800, 3, 10]])
+predicted_price = model.predict(new_house)
+
+print("\nPredicted price for new house:", round(predicted_price[0], 2))
+
+# 8. Visualize actual vs predicted values
+plt.figure(figsize=(8, 5))
+plt.scatter(y_test, y_pred, alpha=0.7)
+
+minimum = min(y_test.min(), y_pred.min())
+maximum = max(y_test.max(), y_pred.max())
+
+plt.plot(
+    [minimum, maximum],
+    [minimum, maximum],
+    linestyle="--",
+    label="Perfect Prediction"
+)
+
+plt.xlabel("Actual House Price")
+plt.ylabel("Predicted House Price")
+plt.title("Multiple Linear Regression: Actual vs Predicted")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+
+plt.savefig("actual_vs_predicted.png", dpi=300)
+plt.show()
